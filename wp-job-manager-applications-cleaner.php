@@ -98,37 +98,49 @@ if ( ! class_exists( 'JobApplicationCleanerPlugin' ) ) {
         }
 
         function remove_unused_folders() {
-            $total_deleted = 0;
-            $failed_delete = 0;
+            $processed = 0;
+            $delete_success = 0;
+            $delete_skipped = 0;
+            $delete_failed = 0;
+            $db_entries = array();
 
             $job_applications_dir = wp_upload_dir()['basedir'] . '/job_applications';
-            if(is_dir($job_applications_dir)) {
+            if( is_dir( $job_applications_dir ) ) {
                 // exclude . and .. folders
                 $entries = array_diff( scandir( $job_applications_dir ), array( '.', '..' ) );
                 global $wpdb;
                 global $wp_filesystem;
 
-                foreach($entries as $entry) {
-                    $entry_full_path = $job_applications_dir . '/' . $entry;
-                    if(is_dir($entry_full_path)) {
-                        $meta_exists_query =
-                        "SELECT *
-                         FROM $wpdb->postmeta
-                         WHERE meta_key = '_secret_dir' AND meta_value = '$entry'";
+                $metas = $wpdb->get_results(
+                                "SELECT meta_value
+                                FROM $wpdb->postmeta
+                                WHERE meta_key = '_secret_dir'");
 
-                        $used = $wpdb->get_var($meta_exists_query);
-                        if ( $used == NULL ) {
+                foreach( $metas as $meta ) {
+                    array_push( $db_entries, $meta->meta_value );
+                }
+
+                foreach( $entries as $entry ) {
+                    $entry_full_path = $job_applications_dir . '/' . $entry;
+                    // process directories only
+                    if( is_dir( $entry_full_path ) ) {
+                        $processed = $processed + 1;
+
+                        if ( in_array( $entry, $db_entries ) ) {
+                            $delete_skipped = $delete_skipped + 1;
+                        }
+                        else {
                             // folder does not exist in database => delete it
                             if ( $wp_filesystem->delete($entry_full_path, true) ) {
-                                $total_deleted = $total_deleted + 1;
+                                $delete_success = $delete_success + 1;
                             }
                             else {
-                                $failed_delete = $failed_delete + 1;
+                                $delete_failed = $delete_failed + 1;
                             }
                         }                        
                     }
                 }
-                return "Deleted folders: $total_deleted. Failed: $failed_delete.";
+                return "Processed: $processed. Deleted: $delete_success. Skipped: $delete_skipped. Failed: $delete_failed.";
             }
             return "$job_applications_dir does not exist";
         }
