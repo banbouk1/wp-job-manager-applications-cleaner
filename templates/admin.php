@@ -49,5 +49,5 @@
                 </td>
             </tr>
         </tbody>
-    </table>        
+    </table>
 </div>

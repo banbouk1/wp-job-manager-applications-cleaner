@@ -13,7 +13,7 @@ Description: Used to cleanup the WP Job Manager - Applications by removing <stro
 
 Version: 1.0.0 
 
-Author: Bassel Banbouk 
+Author: Bassel Banbouk
 
 Author URI: https://www.linkedin.com/in/banbouk/
 
