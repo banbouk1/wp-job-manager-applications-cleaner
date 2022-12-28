@@ -117,7 +117,8 @@ if ( ! class_exists( 'JobApplicationCleanerPlugin' ) ) {
                                 WHERE meta_key = '_secret_dir'");
 
                 foreach( $metas as $meta ) {
-                    array_push( $db_entries, $meta->meta_value );
+                    // not using array_push for performance gains during fetching
+                    $db_entries[$meta->meta_value] = true;
                 }
 
                 foreach( $entries as $entry ) {
@@ -126,7 +127,8 @@ if ( ! class_exists( 'JobApplicationCleanerPlugin' ) ) {
                     if( is_dir( $entry_full_path ) ) {
                         $processed = $processed + 1;
 
-                        if ( in_array( $entry, $db_entries ) ) {
+                        // check if db contains the folder
+                        if ( isset( $db_entries[$entry] ) ) {
                             $delete_skipped = $delete_skipped + 1;
                         }
                         else {
@@ -140,7 +142,11 @@ if ( ! class_exists( 'JobApplicationCleanerPlugin' ) ) {
                         }                        
                     }
                 }
-                return "Processed: $processed. Deleted: $delete_success. Skipped: $delete_skipped. Failed: $delete_failed.";
+                $processed = number_format( $processed );
+                $delete_success = number_format( $delete_success );
+                $delete_skipped = number_format( $delete_skipped );
+                $delete_failed = number_format( $delete_failed );
+                return "Processed: $processed - Deleted: $delete_success - Skipped: $delete_skipped - Failed: $delete_failed.";
             }
             return "$job_applications_dir does not exist";
         }
