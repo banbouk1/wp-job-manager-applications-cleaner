@@ -7,7 +7,7 @@
 /*
 Plugin Name: WP Job Manager - Applications Cleaner 
 
-Plugin URI: https://www.midmac.net/ 
+Plugin URI: https://github.com/banbouk1/wp-job-manager-applications-cleaner
 
 Description: Used to cleanup the WP Job Manager - Applications by removing <strong>duplicates applications</strong> from the database and remove <strong>unsed attachements</strong> from the file system.
 
