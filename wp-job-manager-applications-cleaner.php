@@ -51,45 +51,45 @@ if ( ! class_exists( 'JobApplicationCleanerPlugin' ) ) {
         }
 
         function count_duplicates_in_db() {
+            global $wpdb;
+
             $count_posts_query =
                 "SELECT COUNT(*)
-                 FROM wp_posts
+                 FROM $wpdb->posts AS p
                  LEFT JOIN (
                      SELECT MAX(e.post_id) ID
-                     FROM wp_postmeta AS e
-                     INNER JOIN wp_postmeta AS j ON e.post_id = j.post_id
+                     FROM $wpdb->postmeta AS e
+                     INNER JOIN $wpdb->postmeta AS j ON e.post_id = j.post_id
                      WHERE e.meta_key = 'Email Address' AND j.meta_key = '_job_applied_for'
                      GROUP BY j.meta_value, e.meta_value
-                 ) keep ON wp_posts.ID = keep.ID
-                 WHERE keep.ID IS NULL AND wp_posts.post_type = 'job_application'";
+                 ) keep ON p.ID = keep.ID
+                 WHERE keep.ID IS NULL AND p.post_type = 'job_application'";
 
-            global $wpdb;
-            
             $duplicates = number_format ( $wpdb->get_var( $count_posts_query ) );
             
             return "$duplicates duplicate job applications were found.";
         }
 
         function remove_duplicates_from_db() {
+            global $wpdb;
+
             $delete_posts_query =
-                "DELETE wp_posts.*
-                 FROM wp_posts
+                "DELETE p.*
+                 FROM $wpdb->posts AS p
                  LEFT JOIN (
                      SELECT MAX(e.post_id) ID
-                     FROM wp_postmeta AS e
-                     INNER JOIN wp_postmeta AS j ON e.post_id = j.post_id
+                     FROM $wpdb->postmeta AS e
+                     INNER JOIN $wpdb->postmeta AS j ON e.post_id = j.post_id
                      WHERE e.meta_key = 'Email Address' AND j.meta_key = '_job_applied_for'
                      GROUP BY j.meta_value, e.meta_value
-                 ) keep ON wp_posts.ID = keep.ID
-                 WHERE keep.ID IS NULL AND wp_posts.post_type = 'job_application'";
+                 ) keep ON p.ID = keep.ID
+                 WHERE keep.ID IS NULL AND p.post_type = 'job_application'";
 
             $delete_postmeta_query =
-                "DELETE wp_postmeta.*
-                 FROM wp_postmeta
-                 LEFT JOIN wp_posts ON wp_postmeta.post_id = wp_posts.ID
-                 WHERE wp_posts.ID IS NULL;";
-
-            global $wpdb;
+                "DELETE pm.*
+                 FROM $wpdb->postmeta pm
+                 LEFT JOIN $wpdb->posts as p ON pm.post_id = p.ID
+                 WHERE p.ID IS NULL;";
 
             $deleted_applications = number_format ( $wpdb->query( $delete_posts_query ) );
             $deleted_postmeta = number_format ( $wpdb->query( $delete_postmeta_query ) );
