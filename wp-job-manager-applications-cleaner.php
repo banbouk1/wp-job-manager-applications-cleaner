@@ -9,7 +9,7 @@ Plugin Name: WP Job Manager - Applications Cleaner
 
 Plugin URI: https://github.com/banbouk1/wp-job-manager-applications-cleaner
 
-Description: Used to cleanup the WP Job Manager - Applications by removing <strong>duplicates applications</strong> from the database and remove <strong>unsed attachements</strong> from the file system.
+Description: Used to cleanup the WP Job Manager - Applications by removing <strong>duplicates applications</strong> from the database and remove <strong>unused attachements</strong> from the file system.
 
 Version: 1.0.0 
 

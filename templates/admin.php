@@ -35,7 +35,7 @@
             </tr>
             <tr>
                 <th scope="row">
-                    <label>Delete unsed Folders</label>
+                    <label>Delete unused Folders</label>
                 </th>
                 <td>
                     <form method="post">
@@ -45,7 +45,7 @@
                             }
                         ?> 
                     </form>
-                    <p class="description">This deletes the unsed folders stored on the file system which are not referenced from the database.</p>
+                    <p class="description">This deletes the unused folders stored on the file system which are not referenced from the database.</p>
                 </td>
             </tr>
         </tbody>
